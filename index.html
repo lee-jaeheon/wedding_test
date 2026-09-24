@@ -36,6 +36,8 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{
   margin:0;
+  max-width:100%;
+  overflow-x:hidden;          /* 가로 스크롤 차단 */
   background:var(--ivory);
   color:var(--ink);
   font-family:var(--sans);
@@ -52,7 +54,7 @@ body{
   color:#F2EDE4;
   font-size:13px;
   letter-spacing:-.01em;
-  padding:9px 20px;
+  padding:9px 18px;
   text-align:center;
 }
 .demo-note b{color:#E5C7CE;font-weight:500}
@@ -61,7 +63,7 @@ body{
    머리말
    ──────────────────────────────────────────── */
 header{
-  padding:34px 24px 26px;
+  padding:34px 20px 26px;
   border-bottom:1px solid var(--line);
   text-align:center;
 }
@@ -77,9 +79,15 @@ header{
   font-size:13.5px;
   color:var(--ink-soft);
 }
+@media (max-width:520px){
+  header{padding:24px 18px 20px}
+  .venue{font-size:25px}
+  .venue-sub{font-size:12.5px}
+}
 
 /* ────────────────────────────────────────────
    본문 레이아웃
+   minmax(0,1fr) — 칸이 내용물에 밀려 넓어지지 않도록
    ──────────────────────────────────────────── */
 main{
   max-width:1220px;
@@ -90,21 +98,23 @@ main{
   gap:44px;
   align-items:start;
 }
+main > *{min-width:0}
 @media (max-width:1000px){
-  main{grid-template-columns:1fr;gap:34px;padding-bottom:120px}
+  main{grid-template-columns:minmax(0,1fr);gap:34px;padding:26px 18px 120px}
 }
 
 /* ────────────────────────────────────────────
    조건 선택 영역
    ──────────────────────────────────────────── */
-.field{margin-bottom:32px}
+.field{margin-bottom:32px;min-width:0}
 .field:last-child{margin-bottom:0}
 
 .field-head{
   display:flex;
+  flex-wrap:wrap;
   align-items:baseline;
   justify-content:space-between;
-  gap:12px;
+  gap:4px 12px;
   margin-bottom:12px;
   padding-bottom:7px;
   border-bottom:1px solid var(--line);
@@ -119,6 +129,7 @@ main{
   font-size:12.5px;
   color:var(--ink-faint);
   text-align:right;
+  min-width:0;
 }
 
 /* 달력 */
@@ -126,19 +137,18 @@ main{
   display:flex;
   align-items:center;
   justify-content:space-between;
+  gap:10px;
   margin-bottom:10px;
 }
 .cal-month{
   font-family:var(--serif);
   font-size:17px;
   font-weight:700;
+  min-width:0;
 }
-.cal-nav{
-  display:flex;
-  gap:6px;
-}
+.cal-nav{display:flex;gap:6px;flex:none}
 .cal-nav button{
-  width:32px;height:32px;
+  width:34px;height:34px;
   border:1px solid var(--line);
   background:var(--paper);
   color:var(--ink);
@@ -152,7 +162,7 @@ main{
 
 .cal-grid{
   display:grid;
-  grid-template-columns:repeat(7,1fr);
+  grid-template-columns:repeat(7,minmax(0,1fr));
   gap:3px;
 }
 .cal-dow{
@@ -160,13 +170,14 @@ main{
   font-size:11.5px;
   color:var(--ink-faint);
   padding-bottom:5px;
+  min-width:0;
 }
 .cal-dow.sun{color:#B0576A}
 
 .cal-cell{
   position:relative;
+  min-width:0;
   aspect-ratio:1/1;
-  min-height:40px;
   border:1px solid transparent;
   background:transparent;
   border-radius:2px;
@@ -197,7 +208,7 @@ main{
 .cal-cell[aria-pressed="true"].sun{color:#fff}
 .cal-cell .dot{
   position:absolute;
-  bottom:5px;left:50%;
+  bottom:4px;left:50%;
   transform:translateX(-50%);
   width:4px;height:4px;
   border-radius:50%;
@@ -208,7 +219,7 @@ main{
 .cal-legend{
   display:flex;
   flex-wrap:wrap;
-  gap:14px;
+  gap:8px 14px;
   margin-top:10px;
   font-size:12px;
   color:var(--ink-soft);
@@ -216,19 +227,20 @@ main{
 .cal-legend span{display:flex;align-items:center;gap:5px}
 .cal-legend i{
   width:9px;height:9px;border-radius:50%;
-  background:var(--sage);display:inline-block;
+  background:var(--sage);display:inline-block;flex:none;
 }
 .cal-legend s{color:var(--ink-faint)}
 
 /* 선택 버튼 묶음 */
 .choices{display:grid;gap:8px}
-.choices.two{grid-template-columns:1fr 1fr}
-.choices.three{grid-template-columns:repeat(3,1fr)}
-@media (max-width:520px){
-  .choices.three{grid-template-columns:1fr 1fr}
+.choices.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.choices.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:560px){
+  .choices.three{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
 .choice{
+  min-width:0;
   text-align:left;
   border:1px solid var(--line);
   background:var(--paper);
@@ -246,16 +258,19 @@ main{
 }
 .choice:disabled{opacity:.4;cursor:default}
 .choice .c-name{display:block;font-size:14.5px;font-weight:500}
-.choice .c-meta{display:block;font-size:12px;color:var(--ink-soft);margin-top:2px}
+.choice .c-meta{
+  display:block;
+  font-size:12px;
+  color:var(--ink-soft);
+  margin-top:2px;
+  min-height:1.5em;
+}
 
 /* 인원 입력 */
-.guests{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
+.guests{display:flex;align-items:center;gap:10px}
 .guests button{
-  width:42px;height:42px;
+  width:46px;height:46px;
+  flex:none;
   border:1px solid var(--line);
   background:var(--paper);
   border-radius:2px;
@@ -268,7 +283,8 @@ main{
 .guests input{
   flex:1;
   min-width:0;
-  height:42px;
+  width:100%;
+  height:46px;
   border:1px solid var(--line);
   border-radius:2px;
   background:var(--paper);
@@ -279,7 +295,7 @@ main{
   color:var(--ink);
 }
 .guests-note{
-  margin-top:7px;
+  margin:7px 0 0;
   font-size:12.5px;
   color:var(--ink-soft);
 }
@@ -291,16 +307,17 @@ main{
   display:flex;
   align-items:center;
   gap:11px;
+  min-width:0;
   border:1px solid var(--line);
   background:var(--paper);
   border-radius:2px;
-  padding:10px 13px;
+  padding:11px 13px;
   cursor:pointer;
 }
 .opt:hover{border-color:var(--wine)}
 .opt input{
   appearance:none;
-  width:17px;height:17px;
+  width:18px;height:18px;
   flex:none;
   border:1px solid var(--ink-faint);
   border-radius:1px;
@@ -312,34 +329,40 @@ main{
 .opt input:checked::after{
   content:'';
   position:absolute;
-  left:5px;top:1px;
+  left:5.5px;top:1.5px;
   width:5px;height:10px;
   border:solid #fff;
   border-width:0 2px 2px 0;
   transform:rotate(43deg);
 }
-.opt .o-name{flex:1;font-size:14.5px}
-.opt .o-price{font-size:13px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.opt .o-name{flex:1;min-width:0;font-size:14.5px}
+.opt .o-price{
+  flex:none;
+  font-size:13px;
+  color:var(--ink-soft);
+  font-variant-numeric:tabular-nums;
+}
 
 /* ────────────────────────────────────────────
    견적서
    ──────────────────────────────────────────── */
-.quote-wrap{position:sticky;top:20px}
+.quote-wrap{position:sticky;top:20px;min-width:0}
 @media (max-width:1000px){.quote-wrap{position:static}}
 
 .quote{
   background:var(--paper);
   border:1px solid var(--line);
   border-top:3px solid var(--wine);
-  padding:30px 28px 26px;
+  padding:30px 26px 26px;
 }
-@media (max-width:520px){.quote{padding:24px 18px 20px}}
+@media (max-width:560px){.quote{padding:22px 16px 18px}}
 
 .quote-head{
   display:flex;
+  flex-wrap:wrap;
   align-items:baseline;
   justify-content:space-between;
-  gap:12px;
+  gap:4px 12px;
   padding-bottom:14px;
   border-bottom:1px solid var(--line);
 }
@@ -363,16 +386,12 @@ main{
 .line{
   display:flex;
   align-items:baseline;
-  gap:14px;
+  gap:12px;
   padding:11px 0;
   border-bottom:1px solid var(--line-soft);
 }
 .line-body{flex:1;min-width:0}
-.line-name{
-  font-family:var(--serif);
-  font-size:15.5px;
-  display:block;
-}
+.line-name{font-family:var(--serif);font-size:15.5px;display:block}
 .line-calc{
   display:block;
   font-size:12.5px;
@@ -381,6 +400,7 @@ main{
   font-variant-numeric:tabular-nums;
 }
 .line-amt{
+  flex:none;
   font-family:var(--serif);
   font-size:16px;
   font-variant-numeric:tabular-nums;
@@ -407,37 +427,42 @@ main{
 .sum{
   display:flex;
   justify-content:space-between;
-  gap:14px;
+  gap:12px;
   padding:8px 0;
   font-size:14px;
   color:var(--ink-soft);
 }
-.sum span:last-child{font-variant-numeric:tabular-nums}
+.sum span:last-child{font-variant-numeric:tabular-nums;white-space:nowrap}
 
 .total{
   margin-top:10px;
   padding-top:16px;
   border-top:2px solid var(--ink);
   display:flex;
+  flex-wrap:wrap;
   align-items:flex-end;
   justify-content:space-between;
-  gap:14px;
+  gap:4px 12px;
 }
 .total-label{
   font-family:var(--serif);
   font-size:17px;
   font-weight:700;
+  flex:none;
 }
 .total-amt{
   font-family:var(--serif);
-  font-size:33px;
+  font-size:32px;
   font-weight:700;
-  line-height:1.1;
+  line-height:1.15;
   font-variant-numeric:tabular-nums;
   color:var(--wine);
+  white-space:nowrap;
+  margin-left:auto;
 }
-@media (max-width:520px){.total-amt{font-size:27px}}
-.total-amt small{font-size:19px;font-weight:400}
+@media (max-width:560px){.total-amt{font-size:26px}}
+@media (max-width:360px){.total-amt{font-size:23px}}
+.total-amt small{font-size:.6em;font-weight:400}
 
 .quote-foot{
   margin-top:18px;
@@ -448,18 +473,15 @@ main{
   line-height:1.8;
 }
 
-.actions{
-  margin-top:16px;
-  display:flex;
-  gap:8px;
-}
+.actions{margin-top:16px;display:flex;gap:8px}
 .actions button{
   flex:1;
+  min-width:0;
   border:1px solid var(--line);
   background:var(--paper);
   color:var(--ink);
   border-radius:2px;
-  padding:11px;
+  padding:12px 6px;
   font-family:var(--sans);
   font-size:14px;
   cursor:pointer;
@@ -472,20 +494,21 @@ main{
   left:0;right:0;bottom:0;
   background:var(--ink);
   color:#F7F2E9;
-  padding:13px 20px;
-  padding-bottom:calc(13px + env(safe-area-inset-bottom,0px));
+  padding:12px 18px;
+  padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));
   display:none;
   align-items:center;
   justify-content:space-between;
-  gap:14px;
+  gap:12px;
   z-index:20;
 }
-.bar-label{font-size:12.5px;color:#BFB4A6}
+.bar-label{font-size:12.5px;color:#BFB4A6;flex:none}
 .bar-amt{
   font-family:var(--serif);
-  font-size:21px;
+  font-size:20px;
   font-weight:700;
   font-variant-numeric:tabular-nums;
+  white-space:nowrap;
 }
 @media (max-width:1000px){.bar{display:flex}}
 
@@ -521,7 +544,7 @@ main{
     <div class="field">
       <div class="field-head">
         <h2 class="field-name">예식일</h2>
-        <span class="field-hint" id="dateHint">날짜를 골라주세요</span>
+        <span class="field-hint">날짜를 골라주세요</span>
       </div>
       <div class="cal-bar">
         <div class="cal-month" id="calMonth"></div>
@@ -548,7 +571,7 @@ main{
     <div class="field">
       <div class="field-head">
         <h2 class="field-name">예식 시간</h2>
-        <span class="field-hint">시간대에 따라 대관료가 달라요</span>
+        <span class="field-hint" id="slotHint"></span>
       </div>
       <div class="choices two" id="slotList"></div>
     </div>
@@ -636,7 +659,6 @@ const PRICING = {
 
   venue: '가든뷰 컨벤션',
 
-  // 홀: 수용 인원, 최소 보증 인원, 시간대별 대관료
   halls: [
     { id:'grand',  name:'그랜드홀', capacity:350, minGuests:250,
       hallFee:{ '11:00':3500000, '13:00':4500000, '15:00':3800000, '18:00':5000000 } },
@@ -653,72 +675,66 @@ const PRICING = {
     { id:'18:00', label:'저녁 6시' },
   ],
 
-  // 식대: 1인 단가
   meals: [
     { id:'buffet', name:'한식 뷔페',    price:68000, note:'음료 포함' },
     { id:'course', name:'프리미엄 코스', price:89000, note:'주류 포함' },
   ],
 
   flowers: [
-    { id:'basic',  name:'기본 데코',    price:1500000 },
-    { id:'premium',name:'프리미엄 데코', price:2800000 },
-    { id:'sign',   name:'시그니처 데코', price:4200000 },
+    { id:'basic',   name:'기본 데코',     price:1500000 },
+    { id:'premium', name:'프리미엄 데코', price:2800000 },
+    { id:'sign',    name:'시그니처 데코', price:4200000 },
   ],
 
-  // 추가 항목: price = 고정 금액 / perGuest = 1인당 금액
   options: [
-    { id:'snap',    name:'본식 스냅',      price:900000 },
-    { id:'video',   name:'영상 촬영',      price:1200000 },
-    { id:'mc',      name:'전문 사회자',    price:500000 },
-    { id:'song',    name:'축가',           price:400000 },
-    { id:'pyebaek', name:'폐백실 이용',    price:350000 },
-    { id:'gift',    name:'답례품',         perGuest:3000 },
+    { id:'snap',    name:'본식 스냅',   price:900000 },
+    { id:'video',   name:'영상 촬영',   price:1200000 },
+    { id:'mc',      name:'전문 사회자', price:500000 },
+    { id:'song',    name:'축가',        price:400000 },
+    { id:'pyebaek', name:'폐백실 이용', price:350000 },
+    { id:'gift',    name:'답례품',      perGuest:3000 },
   ],
 
-  // 할인 규칙 — 조건에 맞으면 자동으로 적용되고 견적서에 이유가 함께 표시됩니다
   discounts: [
-    { id:'weekday', label:'평일 예식 할인',     rate:0.10, when:s => s.date && s.date.getDay()>=1 && s.date.getDay()<=5 },
-    { id:'offseason', label:'비수기 할인',      rate:0.15, when:s => s.date && [11,0,1].includes(s.date.getMonth()) },
-    { id:'bulk',    label:'300명 이상 단체 할인', rate:0.05, when:s => s.guests>=300 },
+    { id:'weekday',   label:'평일 예식 할인',      rate:0.10, when:s => s.date && s.date.getDay()>=1 && s.date.getDay()<=5 },
+    { id:'offseason', label:'비수기 할인',         rate:0.15, when:s => s.date && [11,0,1].includes(s.date.getMonth()) },
+    { id:'bulk',      label:'300명 이상 단체 할인', rate:0.05, when:s => s.guests>=300 },
   ],
 
   vatRate: 0.10,
 };
 
 /* ═══════════════════════════════════════════════════════════
-   예약 현황 — 지금은 규칙으로 만들어낸 가짜 데이터입니다.
-   실제로는 식장의 예약 정보가 들어갈 자리예요.
+   예약 현황 — 규칙으로 만들어낸 가짜 데이터
    ═══════════════════════════════════════════════════════════ */
 function isBooked(y, m, d){
   const dow = new Date(y, m, d).getDay();
   const h = (y*31 + (m+1)*97 + d*151) % 100;
-  if (dow === 6) return h < 65;   // 토요일은 대부분 마감
-  if (dow === 0) return h < 35;   // 일요일
-  return h < 8;                   // 평일
+  if (dow === 6) return h < 65;
+  if (dow === 0) return h < 35;
+  return h < 8;
 }
 
 /* ═══════════════════════════════════════════════════════════
    상태
    ═══════════════════════════════════════════════════════════ */
 const state = {
-  date:null,
-  hall:null,
-  slot:null,
-  guests:250,
-  meal:'buffet',
-  flower:'basic',
+  date:null, hall:null, slot:null,
+  guests:250, meal:'buffet', flower:'basic',
   options:new Set(),
 };
 
 const today = new Date(); today.setHours(0,0,0,0);
-let viewY = today.getFullYear(), viewM = today.getMonth();
+
+/* 달력은 다음 달부터 — 이번 달은 남은 날짜가 거의 없어서 */
+const startView = new Date(today.getFullYear(), today.getMonth()+1, 1);
+let viewY = startView.getFullYear(), viewM = startView.getMonth();
 
 const won = n => n.toLocaleString('ko-KR');
 const $ = id => document.getElementById(id);
-
-/* ── 달력 ── */
 const DOW = ['일','월','화','수','목','금','토'];
 
+/* ── 달력 ── */
 function renderCalendar(){
   $('calMonth').textContent = `${viewY}년 ${viewM+1}월`;
   const grid = $('calGrid');
@@ -732,7 +748,7 @@ function renderCalendar(){
   });
 
   const first = new Date(viewY, viewM, 1).getDay();
-  const days = new Date(viewY, viewM+1, 0).getDate();
+  const days  = new Date(viewY, viewM+1, 0).getDate();
 
   for (let i=0; i<first; i++){
     const el = document.createElement('div');
@@ -754,8 +770,7 @@ function renderCalendar(){
     if (past){ btn.classList.add('past'); btn.disabled = true; }
     else if (booked){ btn.classList.add('full'); btn.disabled = true; btn.title = '예약 마감'; }
     else {
-      const discounted = (dow>=1 && dow<=5) || [11,0,1].includes(viewM);
-      if (discounted){
+      if ((dow>=1 && dow<=5) || [11,0,1].includes(viewM)){
         const dot = document.createElement('span');
         dot.className = 'dot';
         btn.appendChild(dot);
@@ -782,14 +797,15 @@ function renderCalendar(){
 $('prevM').onclick = () => { if(--viewM<0){viewM=11;viewY--;} renderCalendar(); };
 $('nextM').onclick = () => { if(++viewM>11){viewM=0;viewY++;} renderCalendar(); };
 
-/* ── 선택 버튼 만들기 ── */
-function buildChoices(containerId, items, getSelected, onPick, meta){
+/* ── 선택 버튼 ── */
+function buildChoices(containerId, items, getSelected, onPick, meta, disabled){
   const box = $(containerId);
   box.innerHTML = '';
   items.forEach(it => {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'choice';
+    b.disabled = !!disabled;
     b.setAttribute('aria-pressed', getSelected()===it.id ? 'true':'false');
     b.innerHTML = `<span class="c-name">${it.name || it.label}</span>` +
                   (meta ? `<span class="c-meta">${meta(it)}</span>` : '');
@@ -802,15 +818,20 @@ function refreshChoices(){
   buildChoices('hallList', PRICING.halls, ()=>state.hall, id=>{
     state.hall = id;
     const h = PRICING.halls.find(x=>x.id===id);
-    if (state.guests < h.minGuests) state.guests = h.minGuests;
+    // 홀을 바꾸면 인원을 그 홀의 범위 안으로 맞춰준다
+    state.guests = Math.min(Math.max(state.guests, h.minGuests), h.capacity);
     $('guests').value = state.guests;
   }, h => `최대 ${h.capacity}명 · 보증 ${h.minGuests}명`);
 
+  $('slotHint').textContent = state.hall
+    ? '시간대에 따라 대관료가 달라요'
+    : '홀을 먼저 골라주세요';
+
   buildChoices('slotList', PRICING.slots, ()=>state.slot, id=>state.slot=id, s => {
-    if (!state.hall) return '홀을 먼저 골라주세요';
+    if (!state.hall) return '';
     const h = PRICING.halls.find(x=>x.id===state.hall);
     return `대관료 ${won(h.hallFee[s.id])}원`;
-  });
+  }, !state.hall);
 
   buildChoices('mealList', PRICING.meals, ()=>state.meal, id=>state.meal=id,
     m => `1인 ${won(m.price)}원 · ${m.note}`);
@@ -839,8 +860,13 @@ function buildOptions(){
 }
 
 /* ── 인원 ── */
-$('gMinus').onclick = () => { state.guests = Math.max(0, state.guests-10); $('guests').value = state.guests; update(); };
-$('gPlus').onclick  = () => { state.guests += 10; $('guests').value = state.guests; update(); };
+function setGuests(n){
+  state.guests = Math.max(0, n);
+  $('guests').value = state.guests;
+  update();
+}
+$('gMinus').onclick = () => setGuests(state.guests - 10);
+$('gPlus').onclick  = () => setGuests(state.guests + 10);
 $('guests').oninput = e => { state.guests = parseInt(e.target.value,10) || 0; update(); };
 
 /* ═══════════════════════════════════════════════════════════
@@ -848,19 +874,22 @@ $('guests').oninput = e => { state.guests = parseInt(e.target.value,10) || 0; up
    ═══════════════════════════════════════════════════════════ */
 function calculate(){
   const lines = [];
-  const hall = PRICING.halls.find(h => h.id === state.hall);
-  const meal = PRICING.meals.find(m => m.id === state.meal);
+  const hall   = PRICING.halls.find(h => h.id === state.hall);
+  const meal   = PRICING.meals.find(m => m.id === state.meal);
   const flower = PRICING.flowers.find(f => f.id === state.flower);
 
-  // 보증 인원은 홀의 최소 보증을 밑돌 수 없음
-  const billed = hall ? Math.max(state.guests, hall.minGuests) : state.guests;
+  // 청구 인원: 최소 보증 이상, 홀 정원 이하
+  const billed = hall
+    ? Math.min(Math.max(state.guests, hall.minGuests), hall.capacity)
+    : state.guests;
 
   if (hall && state.slot){
     const slot = PRICING.slots.find(s => s.id === state.slot);
-    const dayName = state.date ? `${state.date.getMonth()+1}월 ${state.date.getDate()}일 ${DOW[state.date.getDay()]}요일` : '';
+    const dayName = state.date
+      ? `${state.date.getMonth()+1}월 ${state.date.getDate()}일 ${DOW[state.date.getDay()]}요일`
+      : '';
     lines.push({
-      key:'hall',
-      name:'대관료',
+      key:'hall', name:'대관료',
       calc:`${hall.name}${dayName ? ' · ' + dayName : ''} ${slot.label}`,
       amount:hall.hallFee[state.slot],
     });
@@ -868,8 +897,7 @@ function calculate(){
 
   if (hall && billed > 0){
     lines.push({
-      key:'meal',
-      name:'식대',
+      key:'meal', name:'식대',
       calc:`${meal.name} ${won(meal.price)}원 × ${won(billed)}명`,
       amount:meal.price * billed,
     });
@@ -877,15 +905,12 @@ function calculate(){
 
   if (hall){
     lines.push({ key:'flower', name:'플라워', calc:flower.name, amount:flower.price });
-  }
 
-  if (hall){
     PRICING.options.forEach(o => {
       if (!state.options.has(o.id)) return;
       if (o.perGuest){
         lines.push({
-          key:'opt-'+o.id,
-          name:o.name,
+          key:'opt-'+o.id, name:o.name,
           calc:`${won(o.perGuest)}원 × ${won(billed)}명`,
           amount:o.perGuest * billed,
         });
@@ -897,10 +922,9 @@ function calculate(){
 
   const subtotal = lines.reduce((s,l) => s + l.amount, 0);
 
-  const applied = PRICING.discounts.filter(d => d.when(Object.assign({}, state, {guests:billed})));
+  const applied = PRICING.discounts.filter(d => d.when({date:state.date, guests:billed}));
   const discountLines = applied.map(d => ({
-    key:'dc-'+d.id,
-    name:d.label,
+    key:'dc-'+d.id, name:d.label,
     calc:`소계의 ${Math.round(d.rate*100)}%`,
     amount:-Math.round(subtotal * d.rate),
     discount:true,
@@ -924,21 +948,20 @@ function update(){
 
   // 인원 안내
   const note = $('guestNote');
+  note.classList.remove('warn');
   if (!r.hall){
     note.textContent = '홀을 고르면 최소 보증 인원이 표시돼요';
-    note.classList.remove('warn');
   } else if (state.guests < r.hall.minGuests){
     note.textContent = `${r.hall.name}의 최소 보증은 ${r.hall.minGuests}명이라 ${r.hall.minGuests}명으로 계산됩니다`;
     note.classList.add('warn');
   } else if (state.guests > r.hall.capacity){
-    note.textContent = `${r.hall.name} 수용 인원은 ${r.hall.capacity}명이에요`;
+    note.textContent = `${r.hall.name}은 최대 ${r.hall.capacity}명까지라 ${r.hall.capacity}명으로 계산됩니다`;
     note.classList.add('warn');
   } else {
     note.textContent = `${r.hall.name} 수용 ${r.hall.capacity}명 중 ${state.guests}명`;
-    note.classList.remove('warn');
   }
 
-  // 요약 문장
+  // 요약
   const meta = $('quoteMeta');
   if (r.hall && state.slot && state.date){
     const slot = PRICING.slots.find(s => s.id === state.slot);
@@ -991,8 +1014,7 @@ function update(){
 function animateTotal(target){
   const el = $('total'), bar = $('barAmt');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const from = shownTotal;
-  const diff = target - from;
+  const from = shownTotal, diff = target - from;
 
   if (reduce || diff === 0){
     shownTotal = target;
@@ -1021,7 +1043,7 @@ $('resetBtn').onclick = () => {
   state.guests = 250; state.meal = 'buffet'; state.flower = 'basic';
   state.options.clear();
   $('guests').value = 250;
-  viewY = today.getFullYear(); viewM = today.getMonth();
+  viewY = startView.getFullYear(); viewM = startView.getMonth();
   renderCalendar(); refreshChoices(); buildOptions(); update();
 };
 
