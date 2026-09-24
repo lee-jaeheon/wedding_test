@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>예식 견적 — 가든뷰 컨벤션</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ────────────────────────────────────────────
+   색·서체 토큰
+   ──────────────────────────────────────────── */
+:root{
+  --ivory:#FAF6EF;
+  --paper:#FFFDF9;
+  --ink:#2B2420;
+  --ink-soft:#6B6058;
+  --ink-faint:#A69C92;
+  --line:#E3D9C9;
+  --line-soft:#EFE7DA;
+  --wine:#7A2E3F;
+  --wine-soft:#F3E7E9;
+  --sage:#4F6B52;
+  --shade:#EFE9DE;
+
+  --serif:'Gowun Batang', serif;
+  --sans:'Noto Sans KR', system-ui, sans-serif;
+
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0;
+  background:var(--ivory);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ────────────────────────────────────────────
+   시연 안내 띠
+   ──────────────────────────────────────────── */
+.demo-note{
+  background:var(--ink);
+  color:#F2EDE4;
+  font-size:13px;
+  letter-spacing:-.01em;
+  padding:9px 20px;
+  text-align:center;
+}
+.demo-note b{color:#E5C7CE;font-weight:500}
+
+/* ────────────────────────────────────────────
+   머리말
+   ──────────────────────────────────────────── */
+header{
+  padding:34px 24px 26px;
+  border-bottom:1px solid var(--line);
+  text-align:center;
+}
+.venue{
+  font-family:var(--serif);
+  font-size:30px;
+  font-weight:700;
+  letter-spacing:.02em;
+  margin:0;
+}
+.venue-sub{
+  margin:8px 0 0;
+  font-size:13.5px;
+  color:var(--ink-soft);
+}
+
+/* ────────────────────────────────────────────
+   본문 레이아웃
+   ──────────────────────────────────────────── */
+main{
+  max-width:1220px;
+  margin:0 auto;
+  padding:30px 24px 140px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:44px;
+  align-items:start;
+}
+@media (max-width:1000px){
+  main{grid-template-columns:1fr;gap:34px;padding-bottom:120px}
+}
+
+/* ────────────────────────────────────────────
+   조건 선택 영역
+   ──────────────────────────────────────────── */
+.field{margin-bottom:32px}
+.field:last-child{margin-bottom:0}
+
+.field-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+  padding-bottom:7px;
+  border-bottom:1px solid var(--line);
+}
+.field-name{
+  font-family:var(--serif);
+  font-size:18px;
+  font-weight:700;
+  margin:0;
+}
+.field-hint{
+  font-size:12.5px;
+  color:var(--ink-faint);
+  text-align:right;
+}
+
+/* 달력 */
+.cal-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+.cal-month{
+  font-family:var(--serif);
+  font-size:17px;
+  font-weight:700;
+}
+.cal-nav{
+  display:flex;
+  gap:6px;
+}
+.cal-nav button{
+  width:32px;height:32px;
+  border:1px solid var(--line);
+  background:var(--paper);
+  color:var(--ink);
+  border-radius:2px;
+  font-size:15px;
+  line-height:1;
+  cursor:pointer;
+}
+.cal-nav button:hover:not(:disabled){border-color:var(--wine);color:var(--wine)}
+.cal-nav button:disabled{opacity:.35;cursor:default}
+
+.cal-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:3px;
+}
+.cal-dow{
+  text-align:center;
+  font-size:11.5px;
+  color:var(--ink-faint);
+  padding-bottom:5px;
+}
+.cal-dow.sun{color:#B0576A}
+
+.cal-cell{
+  position:relative;
+  aspect-ratio:1/1;
+  min-height:40px;
+  border:1px solid transparent;
+  background:transparent;
+  border-radius:2px;
+  font-family:var(--sans);
+  font-size:14px;
+  color:var(--ink);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+}
+.cal-cell.empty{cursor:default}
+.cal-cell.sun{color:#B0576A}
+.cal-cell:hover:not(:disabled):not(.empty){background:var(--shade)}
+.cal-cell.full{
+  color:var(--ink-faint);
+  cursor:default;
+  text-decoration:line-through;
+  text-decoration-thickness:1px;
+}
+.cal-cell.past{color:#CFC7BC;cursor:default}
+.cal-cell[aria-pressed="true"]{
+  background:var(--wine);
+  color:#fff;
+  font-weight:700;
+}
+.cal-cell[aria-pressed="true"].sun{color:#fff}
+.cal-cell .dot{
+  position:absolute;
+  bottom:5px;left:50%;
+  transform:translateX(-50%);
+  width:4px;height:4px;
+  border-radius:50%;
+  background:var(--sage);
+}
+.cal-cell[aria-pressed="true"] .dot{background:#F0D9DE}
+
+.cal-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  margin-top:10px;
+  font-size:12px;
+  color:var(--ink-soft);
+}
+.cal-legend span{display:flex;align-items:center;gap:5px}
+.cal-legend i{
+  width:9px;height:9px;border-radius:50%;
+  background:var(--sage);display:inline-block;
+}
+.cal-legend s{color:var(--ink-faint)}
+
+/* 선택 버튼 묶음 */
+.choices{display:grid;gap:8px}
+.choices.two{grid-template-columns:1fr 1fr}
+.choices.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:520px){
+  .choices.three{grid-template-columns:1fr 1fr}
+}
+
+.choice{
+  text-align:left;
+  border:1px solid var(--line);
+  background:var(--paper);
+  border-radius:2px;
+  padding:11px 13px;
+  cursor:pointer;
+  font-family:var(--sans);
+  color:var(--ink);
+  transition:border-color .12s, background .12s;
+}
+.choice:hover:not(:disabled){border-color:var(--wine)}
+.choice[aria-pressed="true"]{
+  border-color:var(--wine);
+  background:var(--wine-soft);
+}
+.choice:disabled{opacity:.4;cursor:default}
+.choice .c-name{display:block;font-size:14.5px;font-weight:500}
+.choice .c-meta{display:block;font-size:12px;color:var(--ink-soft);margin-top:2px}
+
+/* 인원 입력 */
+.guests{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.guests button{
+  width:42px;height:42px;
+  border:1px solid var(--line);
+  background:var(--paper);
+  border-radius:2px;
+  font-size:19px;
+  line-height:1;
+  color:var(--ink);
+  cursor:pointer;
+}
+.guests button:hover{border-color:var(--wine);color:var(--wine)}
+.guests input{
+  flex:1;
+  min-width:0;
+  height:42px;
+  border:1px solid var(--line);
+  border-radius:2px;
+  background:var(--paper);
+  text-align:center;
+  font-family:var(--serif);
+  font-size:20px;
+  font-weight:700;
+  color:var(--ink);
+}
+.guests-note{
+  margin-top:7px;
+  font-size:12.5px;
+  color:var(--ink-soft);
+}
+.guests-note.warn{color:var(--wine)}
+
+/* 옵션 */
+.opts{display:grid;gap:7px}
+.opt{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  border:1px solid var(--line);
+  background:var(--paper);
+  border-radius:2px;
+  padding:10px 13px;
+  cursor:pointer;
+}
+.opt:hover{border-color:var(--wine)}
+.opt input{
+  appearance:none;
+  width:17px;height:17px;
+  flex:none;
+  border:1px solid var(--ink-faint);
+  border-radius:1px;
+  background:#fff;
+  cursor:pointer;
+  position:relative;
+}
+.opt input:checked{background:var(--wine);border-color:var(--wine)}
+.opt input:checked::after{
+  content:'';
+  position:absolute;
+  left:5px;top:1px;
+  width:5px;height:10px;
+  border:solid #fff;
+  border-width:0 2px 2px 0;
+  transform:rotate(43deg);
+}
+.opt .o-name{flex:1;font-size:14.5px}
+.opt .o-price{font-size:13px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+
+/* ────────────────────────────────────────────
+   견적서
+   ──────────────────────────────────────────── */
+.quote-wrap{position:sticky;top:20px}
+@media (max-width:1000px){.quote-wrap{position:static}}
+
+.quote{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-top:3px solid var(--wine);
+  padding:30px 28px 26px;
+}
+@media (max-width:520px){.quote{padding:24px 18px 20px}}
+
+.quote-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--line);
+}
+.quote-title{
+  font-family:var(--serif);
+  font-size:21px;
+  font-weight:700;
+  margin:0;
+}
+.quote-date{font-size:12.5px;color:var(--ink-faint)}
+
+.quote-meta{
+  margin:16px 0 4px;
+  font-size:13.5px;
+  color:var(--ink-soft);
+  min-height:22px;
+}
+.quote-meta strong{color:var(--ink);font-weight:500}
+
+.lines{margin:14px 0 0}
+.line{
+  display:flex;
+  align-items:baseline;
+  gap:14px;
+  padding:11px 0;
+  border-bottom:1px solid var(--line-soft);
+}
+.line-body{flex:1;min-width:0}
+.line-name{
+  font-family:var(--serif);
+  font-size:15.5px;
+  display:block;
+}
+.line-calc{
+  display:block;
+  font-size:12.5px;
+  color:var(--ink-soft);
+  margin-top:1px;
+  font-variant-numeric:tabular-nums;
+}
+.line-amt{
+  font-family:var(--serif);
+  font-size:16px;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.line.discount .line-name,
+.line.discount .line-amt{color:var(--sage)}
+
+.line.flash{animation:flash .7s ease-out}
+@keyframes flash{
+  from{background:var(--wine-soft)}
+  to{background:transparent}
+}
+
+.empty-state{
+  padding:36px 4px;
+  text-align:center;
+  color:var(--ink-faint);
+  font-size:14px;
+  line-height:1.9;
+}
+
+.sums{margin-top:4px}
+.sum{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  padding:8px 0;
+  font-size:14px;
+  color:var(--ink-soft);
+}
+.sum span:last-child{font-variant-numeric:tabular-nums}
+
+.total{
+  margin-top:10px;
+  padding-top:16px;
+  border-top:2px solid var(--ink);
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+}
+.total-label{
+  font-family:var(--serif);
+  font-size:17px;
+  font-weight:700;
+}
+.total-amt{
+  font-family:var(--serif);
+  font-size:33px;
+  font-weight:700;
+  line-height:1.1;
+  font-variant-numeric:tabular-nums;
+  color:var(--wine);
+}
+@media (max-width:520px){.total-amt{font-size:27px}}
+.total-amt small{font-size:19px;font-weight:400}
+
+.quote-foot{
+  margin-top:18px;
+  padding-top:14px;
+  border-top:1px solid var(--line-soft);
+  font-size:12px;
+  color:var(--ink-faint);
+  line-height:1.8;
+}
+
+.actions{
+  margin-top:16px;
+  display:flex;
+  gap:8px;
+}
+.actions button{
+  flex:1;
+  border:1px solid var(--line);
+  background:var(--paper);
+  color:var(--ink);
+  border-radius:2px;
+  padding:11px;
+  font-family:var(--sans);
+  font-size:14px;
+  cursor:pointer;
+}
+.actions button:hover{border-color:var(--wine);color:var(--wine)}
+
+/* 좁은 화면 하단 고정 총액 */
+.bar{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  background:var(--ink);
+  color:#F7F2E9;
+  padding:13px 20px;
+  padding-bottom:calc(13px + env(safe-area-inset-bottom,0px));
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  z-index:20;
+}
+.bar-label{font-size:12.5px;color:#BFB4A6}
+.bar-amt{
+  font-family:var(--serif);
+  font-size:21px;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+@media (max-width:1000px){.bar{display:flex}}
+
+:focus-visible{outline:2px solid var(--wine);outline-offset:2px}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important}
+}
+
+@media print{
+  .demo-note,.bar,.actions,.controls,.cal-legend{display:none !important}
+  main{grid-template-columns:1fr;padding:0}
+  body{background:#fff}
+  .quote{border:none;padding:0}
+}
+</style>
+</head>
+<body>
+
+<div class="demo-note">
+  시연용 화면입니다. 표시된 금액과 예약 현황은 모두 <b>임의로 만든 예시값</b>이에요.
+</div>
+
+<header>
+  <h1 class="venue" id="venueName">가든뷰 컨벤션</h1>
+  <p class="venue-sub">조건을 고르면 금액이 바로 계산됩니다</p>
+</header>
+
+<main>
+  <!-- ── 조건 선택 ── -->
+  <section class="controls" aria-label="예식 조건 선택">
+
+    <div class="field">
+      <div class="field-head">
+        <h2 class="field-name">예식일</h2>
+        <span class="field-hint" id="dateHint">날짜를 골라주세요</span>
+      </div>
+      <div class="cal-bar">
+        <div class="cal-month" id="calMonth"></div>
+        <div class="cal-nav">
+          <button type="button" id="prevM" aria-label="이전 달">‹</button>
+          <button type="button" id="nextM" aria-label="다음 달">›</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="calGrid" role="grid"></div>
+      <div class="cal-legend">
+        <span><i></i>할인 적용일</span>
+        <span><s>24</s>예약 마감</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-head">
+        <h2 class="field-name">홀</h2>
+        <span class="field-hint">수용 인원과 최소 보증이 달라요</span>
+      </div>
+      <div class="choices three" id="hallList"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-head">
+        <h2 class="field-name">예식 시간</h2>
+        <span class="field-hint">시간대에 따라 대관료가 달라요</span>
+      </div>
+      <div class="choices two" id="slotList"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-head">
+        <h2 class="field-name">보증 인원</h2>
+        <span class="field-hint">실제 하객이 적어도 이 인원으로 계산돼요</span>
+      </div>
+      <div class="guests">
+        <button type="button" id="gMinus" aria-label="10명 줄이기">−</button>
+        <input type="number" id="guests" value="250" min="0" step="10" inputmode="numeric" aria-label="보증 인원">
+        <button type="button" id="gPlus" aria-label="10명 늘리기">+</button>
+      </div>
+      <p class="guests-note" id="guestNote"></p>
+    </div>
+
+    <div class="field">
+      <div class="field-head">
+        <h2 class="field-name">식사</h2>
+      </div>
+      <div class="choices two" id="mealList"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-head">
+        <h2 class="field-name">플라워</h2>
+      </div>
+      <div class="choices three" id="flowerList"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-head">
+        <h2 class="field-name">추가 항목</h2>
+        <span class="field-hint">필요한 것만 고르면 돼요</span>
+      </div>
+      <div class="opts" id="optList"></div>
+    </div>
+
+  </section>
+
+  <!-- ── 견적서 ── -->
+  <section class="quote-wrap" aria-label="견적서">
+    <div class="quote">
+      <div class="quote-head">
+        <h2 class="quote-title">견적서</h2>
+        <span class="quote-date" id="today"></span>
+      </div>
+
+      <p class="quote-meta" id="quoteMeta"></p>
+
+      <div class="lines" id="lines"></div>
+
+      <div class="sums" id="sums"></div>
+
+      <div class="total">
+        <span class="total-label">합계</span>
+        <span class="total-amt" id="total">0<small>원</small></span>
+      </div>
+
+      <p class="quote-foot">
+        부가세가 포함된 금액입니다.<br>
+        계약금은 합계의 10%이며, 잔금은 예식 7일 전까지 납부합니다.
+      </p>
+
+      <div class="actions">
+        <button type="button" id="printBtn">견적서 인쇄</button>
+        <button type="button" id="resetBtn">처음부터</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="bar" aria-hidden="true">
+  <span class="bar-label">합계</span>
+  <span class="bar-amt" id="barAmt">0원</span>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   가격표 — 실제 가격표를 받으면 이 부분만 바꾸면 됩니다.
+   아래 숫자는 전부 시연용으로 지어낸 값입니다.
+   ═══════════════════════════════════════════════════════════ */
+const PRICING = {
+
+  venue: '가든뷰 컨벤션',
+
+  // 홀: 수용 인원, 최소 보증 인원, 시간대별 대관료
+  halls: [
+    { id:'grand',  name:'그랜드홀', capacity:350, minGuests:250,
+      hallFee:{ '11:00':3500000, '13:00':4500000, '15:00':3800000, '18:00':5000000 } },
+    { id:'chapel', name:'채플홀',  capacity:200, minGuests:150,
+      hallFee:{ '11:00':2800000, '13:00':3600000, '15:00':3000000, '18:00':4000000 } },
+    { id:'garden', name:'가든홀',  capacity:150, minGuests:100,
+      hallFee:{ '11:00':2200000, '13:00':2900000, '15:00':2400000, '18:00':3200000 } },
+  ],
+
+  slots: [
+    { id:'11:00', label:'오전 11시' },
+    { id:'13:00', label:'낮 1시' },
+    { id:'15:00', label:'오후 3시' },
+    { id:'18:00', label:'저녁 6시' },
+  ],
+
+  // 식대: 1인 단가
+  meals: [
+    { id:'buffet', name:'한식 뷔페',    price:68000, note:'음료 포함' },
+    { id:'course', name:'프리미엄 코스', price:89000, note:'주류 포함' },
+  ],
+
+  flowers: [
+    { id:'basic',  name:'기본 데코',    price:1500000 },
+    { id:'premium',name:'프리미엄 데코', price:2800000 },
+    { id:'sign',   name:'시그니처 데코', price:4200000 },
+  ],
+
+  // 추가 항목: price = 고정 금액 / perGuest = 1인당 금액
+  options: [
+    { id:'snap',    name:'본식 스냅',      price:900000 },
+    { id:'video',   name:'영상 촬영',      price:1200000 },
+    { id:'mc',      name:'전문 사회자',    price:500000 },
+    { id:'song',    name:'축가',           price:400000 },
+    { id:'pyebaek', name:'폐백실 이용',    price:350000 },
+    { id:'gift',    name:'답례품',         perGuest:3000 },
+  ],
+
+  // 할인 규칙 — 조건에 맞으면 자동으로 적용되고 견적서에 이유가 함께 표시됩니다
+  discounts: [
+    { id:'weekday', label:'평일 예식 할인',     rate:0.10, when:s => s.date && s.date.getDay()>=1 && s.date.getDay()<=5 },
+    { id:'offseason', label:'비수기 할인',      rate:0.15, when:s => s.date && [11,0,1].includes(s.date.getMonth()) },
+    { id:'bulk',    label:'300명 이상 단체 할인', rate:0.05, when:s => s.guests>=300 },
+  ],
+
+  vatRate: 0.10,
+};
+
+/* ═══════════════════════════════════════════════════════════
+   예약 현황 — 지금은 규칙으로 만들어낸 가짜 데이터입니다.
+   실제로는 식장의 예약 정보가 들어갈 자리예요.
+   ═══════════════════════════════════════════════════════════ */
+function isBooked(y, m, d){
+  const dow = new Date(y, m, d).getDay();
+  const h = (y*31 + (m+1)*97 + d*151) % 100;
+  if (dow === 6) return h < 65;   // 토요일은 대부분 마감
+  if (dow === 0) return h < 35;   // 일요일
+  return h < 8;                   // 평일
+}
+
+/* ═══════════════════════════════════════════════════════════
+   상태
+   ═══════════════════════════════════════════════════════════ */
+const state = {
+  date:null,
+  hall:null,
+  slot:null,
+  guests:250,
+  meal:'buffet',
+  flower:'basic',
+  options:new Set(),
+};
+
+const today = new Date(); today.setHours(0,0,0,0);
+let viewY = today.getFullYear(), viewM = today.getMonth();
+
+const won = n => n.toLocaleString('ko-KR');
+const $ = id => document.getElementById(id);
+
+/* ── 달력 ── */
+const DOW = ['일','월','화','수','목','금','토'];
+
+function renderCalendar(){
+  $('calMonth').textContent = `${viewY}년 ${viewM+1}월`;
+  const grid = $('calGrid');
+  grid.innerHTML = '';
+
+  DOW.forEach((d,i) => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow' + (i===0 ? ' sun' : '');
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const first = new Date(viewY, viewM, 1).getDay();
+  const days = new Date(viewY, viewM+1, 0).getDate();
+
+  for (let i=0; i<first; i++){
+    const el = document.createElement('div');
+    el.className = 'cal-cell empty';
+    grid.appendChild(el);
+  }
+
+  for (let d=1; d<=days; d++){
+    const cur = new Date(viewY, viewM, d);
+    const past = cur < today;
+    const booked = !past && isBooked(viewY, viewM, d);
+    const dow = cur.getDay();
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'cal-cell' + (dow===0 ? ' sun' : '');
+    btn.textContent = d;
+
+    if (past){ btn.classList.add('past'); btn.disabled = true; }
+    else if (booked){ btn.classList.add('full'); btn.disabled = true; btn.title = '예약 마감'; }
+    else {
+      const discounted = (dow>=1 && dow<=5) || [11,0,1].includes(viewM);
+      if (discounted){
+        const dot = document.createElement('span');
+        dot.className = 'dot';
+        btn.appendChild(dot);
+      }
+      btn.addEventListener('click', () => {
+        state.date = cur;
+        renderCalendar();
+        update();
+      });
+    }
+
+    const sel = state.date &&
+      state.date.getFullYear()===viewY &&
+      state.date.getMonth()===viewM &&
+      state.date.getDate()===d;
+    btn.setAttribute('aria-pressed', sel ? 'true' : 'false');
+
+    grid.appendChild(btn);
+  }
+
+  $('prevM').disabled = (viewY===today.getFullYear() && viewM===today.getMonth());
+}
+
+$('prevM').onclick = () => { if(--viewM<0){viewM=11;viewY--;} renderCalendar(); };
+$('nextM').onclick = () => { if(++viewM>11){viewM=0;viewY++;} renderCalendar(); };
+
+/* ── 선택 버튼 만들기 ── */
+function buildChoices(containerId, items, getSelected, onPick, meta){
+  const box = $(containerId);
+  box.innerHTML = '';
+  items.forEach(it => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'choice';
+    b.setAttribute('aria-pressed', getSelected()===it.id ? 'true':'false');
+    b.innerHTML = `<span class="c-name">${it.name || it.label}</span>` +
+                  (meta ? `<span class="c-meta">${meta(it)}</span>` : '');
+    b.onclick = () => { onPick(it.id); refreshChoices(); update(); };
+    box.appendChild(b);
+  });
+}
+
+function refreshChoices(){
+  buildChoices('hallList', PRICING.halls, ()=>state.hall, id=>{
+    state.hall = id;
+    const h = PRICING.halls.find(x=>x.id===id);
+    if (state.guests < h.minGuests) state.guests = h.minGuests;
+    $('guests').value = state.guests;
+  }, h => `최대 ${h.capacity}명 · 보증 ${h.minGuests}명`);
+
+  buildChoices('slotList', PRICING.slots, ()=>state.slot, id=>state.slot=id, s => {
+    if (!state.hall) return '홀을 먼저 골라주세요';
+    const h = PRICING.halls.find(x=>x.id===state.hall);
+    return `대관료 ${won(h.hallFee[s.id])}원`;
+  });
+
+  buildChoices('mealList', PRICING.meals, ()=>state.meal, id=>state.meal=id,
+    m => `1인 ${won(m.price)}원 · ${m.note}`);
+
+  buildChoices('flowerList', PRICING.flowers, ()=>state.flower, id=>state.flower=id,
+    f => `${won(f.price)}원`);
+}
+
+/* ── 추가 항목 ── */
+function buildOptions(){
+  const box = $('optList');
+  box.innerHTML = '';
+  PRICING.options.forEach(o => {
+    const label = document.createElement('label');
+    label.className = 'opt';
+    const price = o.perGuest ? `1인 ${won(o.perGuest)}원` : `${won(o.price)}원`;
+    label.innerHTML = `<input type="checkbox"><span class="o-name">${o.name}</span><span class="o-price">${price}</span>`;
+    const cb = label.querySelector('input');
+    cb.checked = state.options.has(o.id);
+    cb.onchange = () => {
+      cb.checked ? state.options.add(o.id) : state.options.delete(o.id);
+      update();
+    };
+    box.appendChild(label);
+  });
+}
+
+/* ── 인원 ── */
+$('gMinus').onclick = () => { state.guests = Math.max(0, state.guests-10); $('guests').value = state.guests; update(); };
+$('gPlus').onclick  = () => { state.guests += 10; $('guests').value = state.guests; update(); };
+$('guests').oninput = e => { state.guests = parseInt(e.target.value,10) || 0; update(); };
+
+/* ═══════════════════════════════════════════════════════════
+   계산
+   ═══════════════════════════════════════════════════════════ */
+function calculate(){
+  const lines = [];
+  const hall = PRICING.halls.find(h => h.id === state.hall);
+  const meal = PRICING.meals.find(m => m.id === state.meal);
+  const flower = PRICING.flowers.find(f => f.id === state.flower);
+
+  // 보증 인원은 홀의 최소 보증을 밑돌 수 없음
+  const billed = hall ? Math.max(state.guests, hall.minGuests) : state.guests;
+
+  if (hall && state.slot){
+    const slot = PRICING.slots.find(s => s.id === state.slot);
+    const dayName = state.date ? `${state.date.getMonth()+1}월 ${state.date.getDate()}일 ${DOW[state.date.getDay()]}요일` : '';
+    lines.push({
+      key:'hall',
+      name:'대관료',
+      calc:`${hall.name}${dayName ? ' · ' + dayName : ''} ${slot.label}`,
+      amount:hall.hallFee[state.slot],
+    });
+  }
+
+  if (hall && billed > 0){
+    lines.push({
+      key:'meal',
+      name:'식대',
+      calc:`${meal.name} ${won(meal.price)}원 × ${won(billed)}명`,
+      amount:meal.price * billed,
+    });
+  }
+
+  if (hall){
+    lines.push({ key:'flower', name:'플라워', calc:flower.name, amount:flower.price });
+  }
+
+  if (hall){
+    PRICING.options.forEach(o => {
+      if (!state.options.has(o.id)) return;
+      if (o.perGuest){
+        lines.push({
+          key:'opt-'+o.id,
+          name:o.name,
+          calc:`${won(o.perGuest)}원 × ${won(billed)}명`,
+          amount:o.perGuest * billed,
+        });
+      } else {
+        lines.push({ key:'opt-'+o.id, name:o.name, calc:'', amount:o.price });
+      }
+    });
+  }
+
+  const subtotal = lines.reduce((s,l) => s + l.amount, 0);
+
+  const applied = PRICING.discounts.filter(d => d.when(Object.assign({}, state, {guests:billed})));
+  const discountLines = applied.map(d => ({
+    key:'dc-'+d.id,
+    name:d.label,
+    calc:`소계의 ${Math.round(d.rate*100)}%`,
+    amount:-Math.round(subtotal * d.rate),
+    discount:true,
+  }));
+
+  const discountTotal = discountLines.reduce((s,l) => s + l.amount, 0);
+  const net = subtotal + discountTotal;
+  const vat = Math.round(net * PRICING.vatRate);
+
+  return { lines, discountLines, subtotal, net, vat, total:net + vat, billed, hall };
+}
+
+/* ═══════════════════════════════════════════════════════════
+   그리기
+   ═══════════════════════════════════════════════════════════ */
+let prevKeys = new Set();
+let shownTotal = 0;
+
+function update(){
+  const r = calculate();
+
+  // 인원 안내
+  const note = $('guestNote');
+  if (!r.hall){
+    note.textContent = '홀을 고르면 최소 보증 인원이 표시돼요';
+    note.classList.remove('warn');
+  } else if (state.guests < r.hall.minGuests){
+    note.textContent = `${r.hall.name}의 최소 보증은 ${r.hall.minGuests}명이라 ${r.hall.minGuests}명으로 계산됩니다`;
+    note.classList.add('warn');
+  } else if (state.guests > r.hall.capacity){
+    note.textContent = `${r.hall.name} 수용 인원은 ${r.hall.capacity}명이에요`;
+    note.classList.add('warn');
+  } else {
+    note.textContent = `${r.hall.name} 수용 ${r.hall.capacity}명 중 ${state.guests}명`;
+    note.classList.remove('warn');
+  }
+
+  // 요약 문장
+  const meta = $('quoteMeta');
+  if (r.hall && state.slot && state.date){
+    const slot = PRICING.slots.find(s => s.id === state.slot);
+    meta.innerHTML = `<strong>${state.date.getFullYear()}년 ${state.date.getMonth()+1}월 ${state.date.getDate()}일</strong> ` +
+                     `${DOW[state.date.getDay()]}요일 ${slot.label} · ${r.hall.name} · 보증 ${won(r.billed)}명`;
+  } else {
+    meta.textContent = '';
+  }
+
+  // 항목
+  const box = $('lines');
+  const all = [...r.lines, ...r.discountLines];
+
+  if (all.length === 0){
+    box.innerHTML = `<p class="empty-state">날짜와 홀을 고르면<br>항목별 금액이 하나씩 쌓입니다</p>`;
+    prevKeys = new Set();
+  } else {
+    box.innerHTML = '';
+    all.forEach(l => {
+      const row = document.createElement('div');
+      row.className = 'line' + (l.discount ? ' discount' : '');
+      if (!prevKeys.has(l.key)) row.classList.add('flash');
+      row.innerHTML =
+        `<span class="line-body">
+           <span class="line-name">${l.name}</span>
+           ${l.calc ? `<span class="line-calc">${l.calc}</span>` : ''}
+         </span>
+         <span class="line-amt">${l.amount < 0 ? '−' : ''}${won(Math.abs(l.amount))}</span>`;
+      box.appendChild(row);
+    });
+    prevKeys = new Set(all.map(l => l.key));
+  }
+
+  // 소계·부가세
+  const sums = $('sums');
+  if (all.length === 0){
+    sums.innerHTML = '';
+  } else {
+    let html = `<div class="sum"><span>소계</span><span>${won(r.subtotal)}원</span></div>`;
+    if (r.net !== r.subtotal){
+      html += `<div class="sum"><span>할인 적용 후</span><span>${won(r.net)}원</span></div>`;
+    }
+    html += `<div class="sum"><span>부가세 10%</span><span>${won(r.vat)}원</span></div>`;
+    sums.innerHTML = html;
+  }
+
+  animateTotal(r.total);
+}
+
+function animateTotal(target){
+  const el = $('total'), bar = $('barAmt');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const from = shownTotal;
+  const diff = target - from;
+
+  if (reduce || diff === 0){
+    shownTotal = target;
+    el.innerHTML = won(target) + '<small>원</small>';
+    bar.textContent = won(target) + '원';
+    return;
+  }
+
+  const start = performance.now(), dur = 380;
+  function step(now){
+    const p = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const v = Math.round(from + diff * eased);
+    el.innerHTML = won(v) + '<small>원</small>';
+    bar.textContent = won(v) + '원';
+    if (p < 1) requestAnimationFrame(step);
+    else shownTotal = target;
+  }
+  requestAnimationFrame(step);
+}
+
+/* ── 버튼 ── */
+$('printBtn').onclick = () => window.print();
+$('resetBtn').onclick = () => {
+  state.date = null; state.hall = null; state.slot = null;
+  state.guests = 250; state.meal = 'buffet'; state.flower = 'basic';
+  state.options.clear();
+  $('guests').value = 250;
+  viewY = today.getFullYear(); viewM = today.getMonth();
+  renderCalendar(); refreshChoices(); buildOptions(); update();
+};
+
+/* ── 시작 ── */
+$('venueName').textContent = PRICING.venue;
+document.title = `예식 견적 — ${PRICING.venue}`;
+$('today').textContent = `${today.getFullYear()}. ${String(today.getMonth()+1).padStart(2,'0')}. ${String(today.getDate()).padStart(2,'0')}`;
+
+renderCalendar();
+refreshChoices();
+buildOptions();
+update();
+</script>
+</body>
+</html>
